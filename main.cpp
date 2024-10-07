@@ -1,21 +1,3 @@
-/*
-project name: git-widget
-project author:
-    41243140 陳稟承
-    41243144 温博鈞
-    41243131 莊笙禾
-    41243142 彭偉倫
-project description:
-    這是一個基於 Qt 的簡單應用程式，用來展示隊伍成員的資訊。
-    程式包含了多個標籤頁，每個頁面代表一位成員，使用者可以在第一位組員的頁面中透過圖形介面來更改顏色。
-
-project function:
-    1. 展示隊長與組員資訊。
-    2. 提供一個 GUI 介面供使用者調整文字顏色。
-    3. 提供一個 GUI 介面供使用者調整文字樣式。
-    4. 提供一個按鈕讓使用者選取資料夾並顯示該檔案位置
-*/
-
 #include <QApplication>
 #include <QWidget>
 #include <QTabWidget>
@@ -59,7 +41,9 @@ void setupUi(QWidget *windows)
     leader(tabWidget, leaderTextBrowser);
 
     // Tab 2 - 組員1
-    change_color(tabWidget, leaderTextBrowser);
+    QWidget* tab_1 = new QWidget;
+    tab_1->setObjectName("tab1");
+    tabWidget->addTab(tab_1, "組員1");
 
     // Tab 3 - 組員2
     QWidget* tab_2 = new QWidget;
@@ -103,31 +87,4 @@ void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
 
     tab->setLayout(tabLayout);
     tabWidget->addTab(tab, "隊長");
-}
-
-void change_color(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
-    /*
-    使用QT內建的QColor讓使用者有GUI介面可以調整顏色
-    */
-    QWidget *tab = new QWidget();
-    tab->setObjectName("tab_1");
-    QVBoxLayout* tab3Layout = new QVBoxLayout(tab);
-
-    QPushButton *colorButton = new QPushButton("選擇顏色", tab);
-    tab3Layout->addWidget(colorButton);
-
-    QObject::connect(colorButton, &QPushButton::clicked, [leaderTextBrowser]() {
-        QColor color = QColorDialog::getColor(Qt::white, nullptr, "選擇顏色");
-        if (color.isValid()) {
-            QTextCursor cursor = leaderTextBrowser->textCursor();
-            QTextCharFormat format;
-            format.setForeground(color);
-            cursor.select(QTextCursor::Document);
-            cursor.mergeCharFormat(format);
-            leaderTextBrowser->setTextCursor(cursor);
-        }
-    });
-
-    tab->setLayout(tab3Layout);
-    tabWidget->addTab(tab, "組員1");
 }
