@@ -7,10 +7,12 @@
 #include <QColorDialog>
 #include <QTextCursor>
 #include <QTextCharFormat>
+#include <QFileDialog>
 
 void setupUi(QWidget*);
 void leader(QTabWidget*, QTextBrowser*&);
 void change_color(QTabWidget*, QTextBrowser*);
+void choose_file(QTabWidget*, QTextBrowser*);
 
 int main(int argc, char *argv[])
 {
@@ -24,11 +26,11 @@ int main(int argc, char *argv[])
 void setupUi(QWidget *windows)
 {
     QTabWidget *tabWidget;
-    QTextBrowser *leaderTextBrowser;  // 儲存隊長的文字框框
+    QTextBrowser *leaderTextBrowser;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(windows);
 
-    // windows setting
+
     if (windows->objectName().isEmpty())
         windows->setObjectName("Form");
     windows->resize(400, 300);
@@ -37,29 +39,25 @@ void setupUi(QWidget *windows)
     tabWidget = new QTabWidget(windows);
     tabWidget->setObjectName("tabWidget");
 
-    // Tab 1 - 隊長
+
     leader(tabWidget, leaderTextBrowser);
 
-    // Tab 2 - 組員1
     QWidget* tab_1 = new QWidget;
     tab_1->setObjectName("tab1");
     tabWidget->addTab(tab_1, "組員1");
 
-    // Tab 3 - 組員2
+
     QWidget* tab_2 = new QWidget;
     tab_2->setObjectName("tab2");
     tabWidget->addTab(tab_2, "組員2");
 
-    // Tab 3 - 組員3
-    QWidget* tab_3 = new QWidget;
-    tab_3->setObjectName("tab3");
-    tabWidget->addTab(tab_3, "組員3");
 
-    // 一開始顯示隊長頁面
+    choose_file(tabWidget, leaderTextBrowser);
+
+
     tabWidget->setCurrentIndex(0);
 
     mainLayout->addWidget(tabWidget);
-
     windows->setLayout(mainLayout);
 
     QMetaObject::connectSlotsByName(windows);
@@ -70,10 +68,9 @@ void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
     tab = new QWidget();
     tab->setObjectName("tab");
 
-    // 新增佈局自動調整大小
     QVBoxLayout* tabLayout = new QVBoxLayout(tab);
 
-    // 新增文字框
+
     leaderTextBrowser = new QTextBrowser(tab);
     leaderTextBrowser->setObjectName("textBrowser");
     leaderTextBrowser->setText("\n\n"
@@ -84,20 +81,17 @@ void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
                                "");
 
     tabLayout->addWidget(leaderTextBrowser);
-
     tab->setLayout(tabLayout);
     tabWidget->addTab(tab, "隊長");
 }
 
 void change_color(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
-    /*
-    使用QT內建的QColor讓使用者有GUI介面可以調整顏色
-    */
     QWidget *tab = new QWidget();
     tab->setObjectName("tab_1");
     QVBoxLayout* tab3Layout = new QVBoxLayout(tab);
     QPushButton *colorButton = new QPushButton("選擇顏色", tab);
     tab3Layout->addWidget(colorButton);
+
     QObject::connect(colorButton, &QPushButton::clicked, [leaderTextBrowser]() {
         QColor color = QColorDialog::getColor(Qt::white, nullptr, "選擇顏色");
         if (color.isValid()) {
@@ -109,6 +103,30 @@ void change_color(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
             leaderTextBrowser->setTextCursor(cursor);
         }
     });
+
     tab->setLayout(tab3Layout);
     tabWidget->addTab(tab, "組員1");
+}
+
+void choose_file(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
+    QWidget* tab = new QWidget();
+    tab->setObjectName("tab_3");
+
+    QVBoxLayout* tabLayout = new QVBoxLayout(tab);
+
+
+    QPushButton* fileButton = new QPushButton("選擇文件", tab);
+    tabLayout->addWidget(fileButton);
+
+
+    QObject::connect(fileButton, &QPushButton::clicked, [leaderTextBrowser]() {
+        QString filePath = QFileDialog::getOpenFileName(nullptr, "選擇文件", "", "所有文件 (*.*)");
+        if (!filePath.isEmpty()) {
+
+            leaderTextBrowser->setText("<span style=\"color:red;\">選擇的文件路徑為: " + filePath + "</span>");
+        }
+    });
+
+    tab->setLayout(tabLayout);
+    tabWidget->addTab(tab, "組員3");
 }
