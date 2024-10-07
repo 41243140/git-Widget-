@@ -30,7 +30,7 @@ void setupUi(QWidget *windows)
 
     QVBoxLayout *mainLayout = new QVBoxLayout(windows);
 
-    // 設定視窗
+
     if (windows->objectName().isEmpty())
         windows->setObjectName("Form");
     windows->resize(400, 300);
@@ -39,23 +39,22 @@ void setupUi(QWidget *windows)
     tabWidget = new QTabWidget(windows);
     tabWidget->setObjectName("tabWidget");
 
-    // 隊長頁面
+
     leader(tabWidget, leaderTextBrowser);
 
-    // 組員1
     QWidget* tab_1 = new QWidget;
     tab_1->setObjectName("tab1");
     tabWidget->addTab(tab_1, "組員1");
 
-    // 組員2
+
     QWidget* tab_2 = new QWidget;
     tab_2->setObjectName("tab2");
     tabWidget->addTab(tab_2, "組員2");
 
-    // 組員3功能
+
     choose_file(tabWidget, leaderTextBrowser);
 
-    // 一開始顯示隊長頁面
+
     tabWidget->setCurrentIndex(0);
 
     mainLayout->addWidget(tabWidget);
@@ -71,7 +70,7 @@ void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
 
     QVBoxLayout* tabLayout = new QVBoxLayout(tab);
 
-    // 隊長的文字框
+
     leaderTextBrowser = new QTextBrowser(tab);
     leaderTextBrowser->setObjectName("textBrowser");
     leaderTextBrowser->setText("\n\n"
@@ -115,15 +114,15 @@ void choose_file(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
 
     QVBoxLayout* tabLayout = new QVBoxLayout(tab);
 
-    // 新增按鈕來選擇檔案
+
     QPushButton* fileButton = new QPushButton("選擇文件", tab);
     tabLayout->addWidget(fileButton);
 
-    // 點擊按鈕後，開啟文件選擇對話框並將路徑顯示在隊長頁面中
+
     QObject::connect(fileButton, &QPushButton::clicked, [leaderTextBrowser]() {
         QString filePath = QFileDialog::getOpenFileName(nullptr, "選擇文件", "", "所有文件 (*.*)");
         if (!filePath.isEmpty()) {
-            // 使用HTML樣式將文字顏色設為紅色
+
             leaderTextBrowser->setText("<span style=\"color:red;\">選擇的文件路徑為: " + filePath + "</span>");
         }
     });
