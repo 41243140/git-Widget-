@@ -1,4 +1,4 @@
-#include <QApplication>
+﻿#include <QApplication>
 #include <QWidget>
 #include <QTabWidget>
 #include <QTextBrowser>
@@ -87,4 +87,28 @@ void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
 
     tab->setLayout(tabLayout);
     tabWidget->addTab(tab, "隊長");
+}
+
+void change_color(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
+    /*
+    使用QT內建的QColor讓使用者有GUI介面可以調整顏色
+    */
+    QWidget *tab = new QWidget();
+    tab->setObjectName("tab_1");
+    QVBoxLayout* tab3Layout = new QVBoxLayout(tab);
+    QPushButton *colorButton = new QPushButton("選擇顏色", tab);
+    tab3Layout->addWidget(colorButton);
+    QObject::connect(colorButton, &QPushButton::clicked, [leaderTextBrowser]() {
+        QColor color = QColorDialog::getColor(Qt::white, nullptr, "選擇顏色");
+        if (color.isValid()) {
+            QTextCursor cursor = leaderTextBrowser->textCursor();
+            QTextCharFormat format;
+            format.setForeground(color);
+            cursor.select(QTextCursor::Document);
+            cursor.mergeCharFormat(format);
+            leaderTextBrowser->setTextCursor(cursor);
+        }
+    });
+    tab->setLayout(tab3Layout);
+    tabWidget->addTab(tab, "組員1");
 }
