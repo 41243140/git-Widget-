@@ -1,4 +1,4 @@
-﻿#include <QApplication>
+#include <QApplication>
 #include <QWidget>
 #include <QTabWidget>
 #include <QTextBrowser>
@@ -8,11 +8,13 @@
 #include <QTextCursor>
 #include <QTextCharFormat>
 #include <QFileDialog>
+#include <QFontDialog>
 
 void setupUi(QWidget*);
 void leader(QTabWidget*, QTextBrowser*&);
 void change_color(QTabWidget*, QTextBrowser*);
 void choose_file(QTabWidget*, QTextBrowser*);
+void change_text_style(QTabWidget*, QTextBrowser*);
 
 int main(int argc, char *argv[])
 {
@@ -30,7 +32,6 @@ void setupUi(QWidget *windows)
 
     QVBoxLayout *mainLayout = new QVBoxLayout(windows);
 
-
     if (windows->objectName().isEmpty())
         windows->setObjectName("Form");
     windows->resize(400, 300);
@@ -39,22 +40,19 @@ void setupUi(QWidget *windows)
     tabWidget = new QTabWidget(windows);
     tabWidget->setObjectName("tabWidget");
 
-
+    // Tab 1 - 隊長
     leader(tabWidget, leaderTextBrowser);
 
-    QWidget* tab_1 = new QWidget;
-    tab_1->setObjectName("tab1");
-    tabWidget->addTab(tab_1, "組員1");
+    // Tab 2 - 組員1
+    change_color(tabWidget, leaderTextBrowser);
 
+    // Tab 3 - 組員2（加入按鈕來更改隊長頁文字樣式）
+    change_text_style(tabWidget, leaderTextBrowser);
 
-    QWidget* tab_2 = new QWidget;
-    tab_2->setObjectName("tab2");
-    tabWidget->addTab(tab_2, "組員2");
-
-
+    // Tab 4 - 組員3
     choose_file(tabWidget, leaderTextBrowser);
 
-
+    // 一開始顯示隊長頁面
     tabWidget->setCurrentIndex(0);
 
     mainLayout->addWidget(tabWidget);
@@ -64,12 +62,10 @@ void setupUi(QWidget *windows)
 }
 
 void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
-    QWidget *tab;
-    tab = new QWidget();
+    QWidget *tab = new QWidget();
     tab->setObjectName("tab");
 
     QVBoxLayout* tabLayout = new QVBoxLayout(tab);
-
 
     leaderTextBrowser = new QTextBrowser(tab);
     leaderTextBrowser->setObjectName("textBrowser");
@@ -77,8 +73,7 @@ void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
                                "隊長: 41243140 陳稟承\n"
                                "組員1: 41243144 温博鈞\n"
                                "組員2: 41243131 莊笙禾\n"
-                               "組員3: 41243142 彭偉倫"
-                               "");
+                               "組員3: 41243142 彭偉倫");
 
     tabLayout->addWidget(leaderTextBrowser);
     tab->setLayout(tabLayout);
@@ -88,9 +83,9 @@ void leader(QTabWidget* tabWidget, QTextBrowser*& leaderTextBrowser) {
 void change_color(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
     QWidget *tab = new QWidget();
     tab->setObjectName("tab_1");
-    QVBoxLayout* tab3Layout = new QVBoxLayout(tab);
+    QVBoxLayout* tabLayout = new QVBoxLayout(tab);
     QPushButton *colorButton = new QPushButton("選擇顏色", tab);
-    tab3Layout->addWidget(colorButton);
+    tabLayout->addWidget(colorButton);
 
     QObject::connect(colorButton, &QPushButton::clicked, [leaderTextBrowser]() {
         QColor color = QColorDialog::getColor(Qt::white, nullptr, "選擇顏色");
@@ -104,7 +99,7 @@ void change_color(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
         }
     });
 
-    tab->setLayout(tab3Layout);
+    tab->setLayout(tabLayout);
     tabWidget->addTab(tab, "組員1");
 }
 
@@ -114,19 +109,43 @@ void choose_file(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
 
     QVBoxLayout* tabLayout = new QVBoxLayout(tab);
 
-
     QPushButton* fileButton = new QPushButton("選擇文件", tab);
     tabLayout->addWidget(fileButton);
-
 
     QObject::connect(fileButton, &QPushButton::clicked, [leaderTextBrowser]() {
         QString filePath = QFileDialog::getOpenFileName(nullptr, "選擇文件", "", "所有文件 (*.*)");
         if (!filePath.isEmpty()) {
-
             leaderTextBrowser->setText("<span style=\"color:red;\">選擇的文件路徑為: " + filePath + "</span>");
         }
     });
 
     tab->setLayout(tabLayout);
     tabWidget->addTab(tab, "組員3");
+}
+
+void change_text_style(QTabWidget* tabWidget, QTextBrowser* leaderTextBrowser) {
+    QWidget *tab = new QWidget();
+    tab->setObjectName("tab_2");
+    QVBoxLayout* tabLayout = new QVBoxLayout(tab);
+
+    // 新增一個按鈕來改變隊長文字的字體樣式
+    QPushButton *fontButton = new QPushButton("更改字體樣式", tab);
+    tabLayout->addWidget(fontButton);
+
+    // 當按下按鈕時，彈出字體選擇框，並應用到隊長頁面的文字
+    QObject::connect(fontButton, &QPushButton::clicked, [leaderTextBrowser]() {
+        bool ok;
+        QFont font = QFontDialog::getFont(&ok, leaderTextBrowser->font(), nullptr, "選擇字體樣式");
+        if (ok) {
+            QTextCursor cursor = leaderTextBrowser->textCursor();
+            QTextCharFormat format;
+            format.setFont(font);
+            cursor.select(QTextCursor::Document);
+            cursor.mergeCharFormat(format);
+            leaderTextBrowser->setTextCursor(cursor);
+        }
+    });
+
+    tab->setLayout(tabLayout);
+    tabWidget->addTab(tab, "組員2");
 }
